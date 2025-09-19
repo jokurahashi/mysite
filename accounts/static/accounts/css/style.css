@@ -1,0 +1,8 @@
+/* help_text を横に並べる */
+.helptext {
+  display: inline-block;
+  margin-left: 10px;
+  color: gray;
+  font-size: 0.9em;
+  white-space: nowrap;  /* 折り返さず横に表示 */
+}

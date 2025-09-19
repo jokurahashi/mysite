@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>ユーザー登録</title>
+</head>
+<body>
+    <h1>ユーザー登録</h1>
+
+    <!-- フォーム全体のエラー -->
+    {% if form.non_field_errors %}
+        <div style="color:red;">
+            {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        <!-- 各フィールド -->
+        <div>
+            <label>{{ form.username.label }}</label>
+            {{ form.username }}
+            {% for error in form.username.errors %}
+                <div style="color:red;">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div>
+            <label>{{ form.email.label }}</label>
+            {{ form.email }}
+            {% for error in form.email.errors %}
+                <div style="color:red;">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div>
+            <label>{{ form.password1.label }}</label>
+            {{ form.password1 }}
+            {% for error in form.password1.errors %}
+                <div style="color:red;">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div>
+            <label>{{ form.birthday.label }}</label>
+            {{ form.birthday }}
+            {% for error in form.birthday.errors %}
+                <div style="color:red;">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <button type="submit">登録</button>
+    </form>
+</body>
+</html>

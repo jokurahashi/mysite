@@ -1,0 +1,42 @@
+{% block content %}
+  <h2>ユーザー一覧</h2>
+
+ <!-- メッセージを表示 -->
+  {% if messages %}
+    <ul>
+      {% for message in messages %}
+        <script>
+          alert("{{ message }}");
+        </script>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <table border="1" cellpadding="5">
+    <tr>
+      <th>ユーザー名</th>
+      <th>メールアドレス</th>
+      <th>誕生日</th>
+    </tr>
+    {% for user in users %}
+      <tr>
+        <td>
+          <a href="{% url 'accounts:user_detail' user.pk %}">{{ user.username }}</a>
+        </td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.birthday|date:"Y-m-d" }}</td>
+      </tr>
+    {% empty %}
+      <tr>
+        <td colspan="3">登録されたユーザーはいません。</td>
+      </tr>
+    {% endfor %}
+  </table>
+
+  <!-- テーブルの下にボタン -->
+<p >
+    <a href="{% url 'accounts:signup' %}">新規ユーザー登録</a>
+</p>
+
+{% endblock %}
+

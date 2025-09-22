@@ -1,0 +1,26 @@
+{% block content %}
+<h2>{{ user.username }} の詳細</h2>
+
+{% if messages %}
+  {% for message in messages %}
+    <script>
+      alert("{{ message }}");
+    </script>
+  {% endfor %}
+{% endif %}
+
+<p><strong>ユーザー名:</strong> {{ user.username }}</p>
+<p><strong>メールアドレス:</strong> {{ user.email }}</p>
+<p><strong>誕生日:</strong> {{ user.birthday|date:"Y-m-d" }}</p>
+<p><strong>削除済み:</strong> {% if user.is_deleted %}はい{% else %}いいえ{% endif %}</p>
+
+<!-- 編集ボタン -->
+<a href="{% url 'accounts:user_edit' user.pk %}">編集</a>
+
+<!-- 削除ボタン -->
+<a href="{% url 'accounts:user_delete' user.pk %}">削除</a>
+
+<!-- 一覧に戻る -->
+<a href="{% url 'accounts:user_list' %}">ユーザー一覧に戻る</a>
+
+{% endblock %}

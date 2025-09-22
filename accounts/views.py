@@ -1,7 +1,14 @@
+from django.shortcuts import render, redirect, get_object_or_404
 from django.shortcuts import render, redirect
-from .forms import CustomUserCreationForm
 from django.contrib.auth import login
+from .forms import CustomUserCreationForm
+from .forms import CustomUserEditForm
+from .models import CustomUser
+from django.contrib import messages
 
+
+
+# ユーザー登録ビュー
 def signup(request):
     if request.method == "POST":
         form = CustomUserCreationForm(request.POST)
@@ -9,14 +16,60 @@ def signup(request):
             # ユーザー保存
             user = form.save(commit=False)
             raw_password = form.cleaned_data["password1"]
-            user.set_password(raw_password)  # パスワードをハッシュ化して保存
+            user.set_password(raw_password)  # パスワードをハッシュ化
             user.save()
 
-            # 登録完了画面
-            return render(request, "home.html", {
-                "user": user,
-                "raw_password": raw_password,  # パスワード表示用
-            })
+            # ログイン状態にする場合
+            login(request, user)
+
+            messages.success(request, "登録が完了しました")
+
+            # ユーザー一覧画面へリダイレクト
+            return redirect("accounts:user_list")
     else:
         form = CustomUserCreationForm()
     return render(request, "accounts/signup.html", {"form": form})
+
+
+# ユーザー一覧ビュー
+def user_list(request):
+    users = CustomUser.objects.all()
+    return render(request, "accounts/user_list.html", {"users": users})
+
+from .forms import CustomUserUpdateForm
+
+def user_detail(request, pk):
+    user = get_object_or_404(CustomUser, pk=pk)
+
+    # 編集処理
+    if request.method == "POST" and "edit_user" in request.POST:
+        form = CustomUserUpdateForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect("accounts:user_list")
+    else:
+        form = CustomUserUpdateForm(instance=user)
+
+    return render(request, "accounts/user_detail.html", {"user": user, "form": form})
+
+def user_edit(request, pk):
+    user = get_object_or_404(CustomUser, pk=pk)
+    if request.method == "POST":
+        form = CustomUserEditForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "ユーザー情報を編集しました")
+            return redirect("accounts:user_detail", pk=user.pk)  # 詳細に戻る
+    else:
+        form = CustomUserEditForm(instance=user)
+    return render(request, "accounts/user_edit.html", {"form": form, "user": user})
+
+
+def user_delete(request, pk):
+    user = get_object_or_404(CustomUser, pk=pk)
+    if request.method == "POST":
+        user.is_deleted = True  # 論理削除
+        user.save()
+        messages.success(request, "ユーザーを削除しました")
+        return redirect("accounts:user_detail", pk=user.pk)  # 詳細に戻る
+    return render(request, "accounts/user_delete.html", {"user": user})

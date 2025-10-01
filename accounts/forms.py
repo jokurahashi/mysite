@@ -99,4 +99,4 @@ class CustomUserEditForm(forms.ModelForm):
     """ユーザー編集用フォーム"""
     class Meta:
         model = CustomUser
-        fields = ("username", "email", "birthday")  # パスワードは編集しない場合は除外
+        fields = ("username", "email", "birthday")

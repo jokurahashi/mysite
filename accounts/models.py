@@ -8,7 +8,7 @@ class CustomUser(AbstractUser):
         verbose_name="ユーザー名",
         error_messages={
             "unique": "同じユーザー名が既に登録済みです。",
-        }
+        } 
     )
     email = models.EmailField(
         unique=True,
@@ -31,5 +31,5 @@ class CustomUser(AbstractUser):
     # 論理削除
     def delete(self, using=None, keep_parents=False):
         self.is_deleted = True
-        self.is_active = False 
+        self.is_active = False
         self.save()

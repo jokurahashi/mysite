@@ -6,8 +6,6 @@ from .forms import CustomUserEditForm
 from .models import CustomUser
 from django.contrib import messages
 
-
-
 # ユーザー登録ビュー
 def signup(request):
     if request.method == "POST":
@@ -18,9 +16,6 @@ def signup(request):
             raw_password = form.cleaned_data["password1"]
             user.set_password(raw_password)  # パスワードをハッシュ化
             user.save()
-
-            # ログイン状態にする場合
-            login(request, user)
 
             messages.success(request, "登録が完了しました")
 
@@ -38,20 +33,12 @@ def user_list(request):
 
 from .forms import CustomUserUpdateForm
 
+# ユーザー詳細
 def user_detail(request, pk):
     user = get_object_or_404(CustomUser, pk=pk)
+    return render(request, "accounts/user_detail.html", {"user": user, })
 
-    # 編集処理
-    if request.method == "POST" and "edit_user" in request.POST:
-        form = CustomUserUpdateForm(request.POST, instance=user)
-        if form.is_valid():
-            form.save()
-            return redirect("accounts:user_list")
-    else:
-        form = CustomUserUpdateForm(instance=user)
-
-    return render(request, "accounts/user_detail.html", {"user": user, "form": form})
-
+# ユーザー編集
 def user_edit(request, pk):
     user = get_object_or_404(CustomUser, pk=pk)
     if request.method == "POST":
@@ -64,7 +51,7 @@ def user_edit(request, pk):
         form = CustomUserEditForm(instance=user)
     return render(request, "accounts/user_edit.html", {"form": form, "user": user})
 
-
+# ユーザー削除(論理削除)
 def user_delete(request, pk):
     user = get_object_or_404(CustomUser, pk=pk)
     if request.method == "POST":

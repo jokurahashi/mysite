@@ -17,6 +17,8 @@
       <th>ユーザー名</th>
       <th>メールアドレス</th>
       <th>誕生日</th>
+      <th>作成日時</th>
+      <th>更新日時</th>
     </tr>
     {% for user in users %}
       <tr>
@@ -25,6 +27,8 @@
         </td>
         <td>{{ user.email }}</td>
         <td>{{ user.birthday|date:"Y-m-d" }}</td>
+        <td>{{ user.created_at|date:"Y-m-d H:i" }}</td>
+        <td>{{ user.updated_at|date:"Y-m-d H:i" }}</td>
       </tr>
     {% empty %}
       <tr>

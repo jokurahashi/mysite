@@ -28,9 +28,23 @@ def signup(request):
 
 # ユーザー一覧ビュー
 def user_list(request):
-    users = CustomUser.objects.all()
     users = CustomUser.objects.order_by("-created_at")  # ← 作成日時の降順
-    users = CustomUser.objects.all().order_by("-updated_at")  # 更新日時の降順
+    users = CustomUser.objects.order_by("-updated_at")  # 更新日時の降順
+
+    # 検索機能(検索処理を行う、空白だと全件表示させる)
+    username_query = request.GET.get("username", "")
+    email_query = request.GET.get("email", "")
+
+    if username_query:  # 大文字と小文字の区別を行う
+        users = [users for users in users if username_query in users.username]
+    if email_query:  # メールアドレスは大文字と小文字の区別を行わない
+        users = users.filter(email__icontains=email_query)
+
+    context = {
+        "users": users,
+        "username_query": username_query,
+        "email_query": email_query,
+    }
     return render(request, "accounts/user_list.html", {"users": users})
 
 

@@ -12,6 +12,12 @@
     </ul>
   {% endif %}
 
+  <form method="get" style="margin-bottom: 10px;">
+  <input type="text" name="username" placeholder="ユーザー名" value="{{ username_query }}">
+  <input type="text" name="email" placeholder="メールアドレス" value="{{ email_query }}">
+  <button type="submit">検索</button>
+  </form>
+
   <table border="1" cellpadding="5">
     <tr>
       <th>ユーザー名</th>

@@ -1,11 +1,27 @@
-
-
 {% block content %}
 <h2>{{ user.username }} の編集</h2>
 
 <form method="post">
   {% csrf_token %}
-  {{ form.as_p }}
+
+  <p>
+    <label for="{{ form.username.id_for_label }}">ユーザー名:</label>
+    {{ form.username }}
+    
+  </p>
+
+  <p>
+    <label for="{{ form.email.id_for_label }}">メールアドレス:</label>
+    {{ form.email }}
+    
+  </p>
+
+  <p>
+    <label for="{{ form.birthday.id_for_label }}">誕生日:</label>
+    {{ form.birthday }}
+    
+  </p>
+
   <button type="submit">保存</button>
 </form>
 

@@ -1,9 +1,7 @@
+__pycache__/
 *.pyc
-./accounts/__pycache__/
-db.sqlite3
-/media/
-staticfiles/
-.env
-*.log
+*.pyo
+env/
+venv/
 .vscode/
-.idea/
+*.log

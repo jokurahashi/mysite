@@ -28,8 +28,7 @@ def signup(request):
 
 # ユーザー一覧ビュー
 def user_list(request):
-    users = CustomUser.objects.order_by("-created_at")  # ← 作成日時の降順
-    users = CustomUser.objects.order_by("-updated_at")  # 更新日時の降順
+    users = CustomUser.objects.all().order_by("-updated_at", "-created_at")
 
     # 検索機能(検索処理を行う、空白だと全件表示させる)
     username_query = request.GET.get("username", "")

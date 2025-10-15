@@ -20,6 +20,7 @@
 
   <table border="1" cellpadding="5">
     <tr>
+      <th>No</th>
       <th>ユーザー名</th>
       <th>メールアドレス</th>
       <th>誕生日</th>
@@ -28,6 +29,7 @@
     </tr>
     {% for user in users %}
       <tr>
+        <td>{{ forloop.counter }}</td>
         <td>
           <a href="{% url 'accounts:user_detail' user.pk %}">{{ user.username }}</a>
         </td>
@@ -38,7 +40,7 @@
       </tr>
     {% empty %}
       <tr>
-        <td colspan="3">登録されたユーザーはいません。</td>
+        <td colspan="6">登録されたユーザーはいません。</td>
       </tr>
     {% endfor %}
   </table>

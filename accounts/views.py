@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.shortcuts import render, redirect
-from .forms import CustomUserCreationForm
-from .forms import CustomUserEditForm
+
+# from django.shortcuts import render, redirect
+from .forms import CustomUserCreationForm, CustomUserEditForm
+
+# from .forms import CustomUserEditForm
 from .models import CustomUser
 from django.contrib import messages
 
@@ -35,7 +37,7 @@ def user_list(request):
     email_query = request.GET.get("email", "")
 
     if username_query:  # 大文字と小文字の区別を行う
-        users = [users for users in users if username_query in users.username]
+        users = users.filter(username__icontains=username_query)
     if email_query:  # メールアドレスは大文字と小文字の区別を行わない
         users = users.filter(email__icontains=email_query)
 
@@ -44,10 +46,7 @@ def user_list(request):
         "username_query": username_query,
         "email_query": email_query,
     }
-    return render(request, "accounts/user_list.html", {"users": users})
-
-
-from .forms import CustomUserUpdateForm
+    return render(request, "accounts/user_list.html", context)
 
 
 # ユーザー詳細
@@ -73,7 +72,8 @@ def user_edit(request, pk):
             return redirect("accounts:user_detail", pk=user.pk)  # 詳細に戻る
     else:
         form = CustomUserEditForm(instance=user)
-    return render(request, "accounts/user_edit.html", {"form": form, "user": user})
+    context = {"form": form, "user": user}
+    return render(request, "accounts/user_edit.html", context)
 
 
 # ユーザー削除(論理削除)

@@ -6,6 +6,7 @@ from .models import CustomUser
 from django.core.exceptions import ValidationError
 import datetime
 
+
 class CustomUserCreationForm(UserCreationForm):
     # 確認用パスワードは削除
     password2 = None
@@ -26,13 +27,13 @@ class CustomUserCreationForm(UserCreationForm):
         error_messages={
             "unique": "このメールアドレスはすでに登録されています。",
             "invalid": "正しいメールアドレスを入力してください。",
-        }
+        },
     )
 
     # 誕生日フィールド
     birthday = forms.DateField(
         label="誕生日",
-        widget=forms.DateInput(attrs={'type': 'date'}),
+        widget=forms.DateInput(attrs={"type": "date"}),
         required=True,
     )
 
@@ -48,10 +49,11 @@ class CustomUserCreationForm(UserCreationForm):
             field.help_text = ""
 
         # ユーザー名エラー文
-        self.fields["username"].error_messages.update({
-            "unique": "同じユーザー名が既に登録済みです。",
-        })
-
+        self.fields["username"].error_messages.update(
+            {
+                "unique": "同じユーザー名が既に登録済みです。",
+            }
+        )
 
     # パスワード独自バリデーション
     def clean_password1(self):
@@ -61,7 +63,9 @@ class CustomUserCreationForm(UserCreationForm):
         if password.isdigit():
             raise ValidationError("パスワードを数字だけにすることはできません。")
         if password.lower() in ["password", "12345678", "qwerty"]:
-            raise ValidationError("パスワードが簡単すぎます。別のものを入力してください。")
+            raise ValidationError(
+                "パスワードが簡単すぎます。別のものを入力してください。"
+            )
         return password
 
     # 誕生日バリデーション
@@ -70,11 +74,10 @@ class CustomUserCreationForm(UserCreationForm):
         if birthday > datetime.date.today():
             raise ValidationError("未来の日付は誕生日に指定できません。")
         return birthday
-    
+
 
 # accounts/forms.py の末尾に追加
-from django import forms
-from .models import CustomUser
+
 
 class CustomUserUpdateForm(forms.ModelForm):
     """
@@ -82,6 +85,7 @@ class CustomUserUpdateForm(forms.ModelForm):
     - username, email, birthday を編集可能
     - is_deleted を操作して論理削除できる
     """
+
     class Meta:
         model = CustomUser
         fields = ["username", "email", "birthday", "is_deleted"]
@@ -95,8 +99,10 @@ class CustomUserUpdateForm(forms.ModelForm):
             "is_deleted": "削除済み",
         }
 
+
 class CustomUserEditForm(forms.ModelForm):
     """ユーザー編集用フォーム"""
+
     class Meta:
         model = CustomUser
         fields = ("username", "email", "birthday")

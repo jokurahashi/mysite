@@ -50,41 +50,45 @@
   </table>
 
   <p><a href="{% url 'accounts:signup' %}">新規ユーザー登録</a></p>
-
-  <!-- 検索履歴 -->
+  
+<!-- 検索履歴 -->
   <script>
-    const HISTORY_KEY = "userSearchHistory";
+  const HISTORY_KEY = "userSearchHistory";
 
-    // 履歴を取得
-    function getHistory() {
-      const history = localStorage.getItem(HISTORY_KEY);
-      return history ? JSON.parse(history) : [];
-    }
+  // 履歴を取得
+  function getHistory() {
+    const history = localStorage.getItem(HISTORY_KEY);
+    return history ? JSON.parse(history) : [];
+  }
 
-    // 履歴を保存
-    function saveHistory(username, email) {
-      if (!username && !email) return; 
+  // 履歴を保存
+  function saveHistory(username, email) {
+    if (!username && !email) return;
 
-      const history = getHistory();
-      const newdata = { username, email };
+    const history = getHistory();
+    const newdata = { username, email };
 
-      // 最新を先頭に追加
-      filtered.unshift(newdata);
+    // 重複削除
+    const filtered = history.filter(
+      item => item.username !== username || item.email !== email
+    );
 
-      // 最大5件まで保存
-      localStorage.setItem(HISTORY_KEY, JSON.stringify(filtered.slice(0, 10)));
-    }
+    // 最新を先頭に追加
+    filtered.unshift(newdata);
 
-    // 履歴を表示
-    function displayHistory() {
-      const historyList = document.getElementById("historyList");
-      const history = getHistory();
-      historyList.innerHTML = "";
+    // 最大5件まで保存
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(filtered.slice(0, 5)));
+  }
 
-      history.forEach(item => {
-        const li = document.createElement("li");
-        li.style.padding = "3px 0";
+  // 履歴を表示
+  function displayHistory() {
+    const historyList = document.getElementById("historyList");
+    const history = getHistory();
+    historyList.innerHTML = "";
 
+    history.forEach(item => {
+      const li = document.createElement("li");
+      li.style.padding = "3px 0";
       const span = document.createElement("span");
       span.textContent = `${item.username || "User Not"} / ${item.email || "Email Not"}`;
       span.style.cursor = "pointer"; // 文字部分だけクリック可能
@@ -99,14 +103,14 @@
     });
   }
 
-    // 検索時に履歴保存
-    document.getElementById("searchForm").addEventListener("submit", () => {
-      const username = document.getElementById("usernameInput").value.trim();
-      const email = document.getElementById("emailInput").value.trim();
-      saveHistory(username, email);
-    });
+  // 検索時に履歴保存
+  document.getElementById("searchForm").addEventListener("submit", () => {
+    const username = document.getElementById("usernameInput").value.trim();
+    const email = document.getElementById("emailInput").value.trim();
+    saveHistory(username, email);
+  });
 
-    // ページ読み込み時に履歴を表示
-    displayHistory();
-  </script>
+  // ページ読み込み時に履歴を表示
+  displayHistory();
+</script>
 {% endblock %}

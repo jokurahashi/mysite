@@ -1,9 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-
-# from django.shortcuts import render, redirect
 from .forms import CustomUserCreationForm, CustomUserEditForm
-
-# from .forms import CustomUserEditForm
 from .models import CustomUser
 from django.contrib import messages
 

@@ -33,7 +33,7 @@ def user_list(request):
     email_query = request.GET.get("email", "")
 
     if username_query:  # 大文字と小文字の区別を行う
-        users = users.filter(username__icontains=username_query)
+        users = users.filter(username__contains=username_query)
     if email_query:  # メールアドレスは大文字と小文字の区別を行わない
         users = users.filter(email__icontains=email_query)
 

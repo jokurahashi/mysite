@@ -26,7 +26,7 @@ class TestUserDetailView:
         assert response.context["user"].is_deleted is False
 
     def test_user_updated_at_changes_on_update(self, client):
-        """ユーザー情報を更新した際、updated_at が更新されることを確認"""
+        """ユーザー情報を更新した際、更新されることを確認"""
         user = CustomUser.objects.create_user(
             username="bob",
             email="bob@example.com",
@@ -34,7 +34,6 @@ class TestUserDetailView:
         )
         old_updated_at = user.updated_at
 
-        # 少し時間をずらすため
         before_update = timezone.now()
         user.username = "bobby"
         user.save()
@@ -44,7 +43,7 @@ class TestUserDetailView:
         assert user.updated_at > before_update
 
     def test_user_is_deleted_flag_after_delete(self, client):
-        """削除処理後、is_deleted フラグが True（削除済み）になることを確認"""
+        """削除処理後、削除済みになることを確認"""
         user = CustomUser.objects.create_user(
             username="charlie",
             email="charlie@example.com",

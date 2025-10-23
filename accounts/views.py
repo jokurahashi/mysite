@@ -2,6 +2,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import CustomUserCreationForm, CustomUserEditForm
 from .models import CustomUser
 from django.contrib import messages
+import csv
+from django.http import HttpResponse
+from django.contrib.auth import get_user_model
 
 
 # ユーザー登録ビュー
@@ -81,3 +84,30 @@ def user_delete(request, pk):
         messages.success(request, "ユーザーを削除しました")
         return redirect("accounts:user_detail", pk=user.pk)  # 詳細に戻る
     return render(request, "accounts/user_delete.html", {"user": user})
+
+
+User = get_user_model()
+
+
+def export_users_csv(request):
+    # 全ユーザーを取得
+    users = User.objects.all()
+    # CSVを生成
+    response = HttpResponse(content_type="text/csv; charset=utf-8")
+    response["Content-Disposition"] = 'attachment; filename="users.csv"'
+    writer = csv.writer(response)
+    writer.writerow(["ID", "Username", "Email", "Created At"])
+    for user in users:
+        writer.writerow(
+            [
+                user.id,
+                user.username,
+                user.email,
+                (
+                    user.date_joined.strftime("%Y-%m-%d %H:%M:%S")
+                    if user.date_joined
+                    else ""
+                ),
+            ]
+        )
+    return response

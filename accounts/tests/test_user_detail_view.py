@@ -25,7 +25,7 @@ class TestUserDetailView:
         assert response.context["user"].birthday is None
         assert response.context["user"].is_deleted is False
 
-    def test_user_updated_at_changes_on_update(self, client):
+    def test_user_updated_at_changes_on_update(self):
         """ユーザー情報を更新した際、更新されることを確認"""
         user = CustomUser.objects.create_user(
             username="bob",

@@ -54,7 +54,11 @@
   <p><a href="{% url 'accounts:export_users_csv' %}">CSVダウンロード</a></p>
 
 
-
+<p><a href="#" onclick="document.getElementById('csv_upload').click(); return false;">CSVインポート</a></p>
+<form id="csv_form" action="{% url 'accounts:import_users_csv' %}" method="post" enctype="multipart/form-data" style="display: none;">
+    {% csrf_token %}
+    <input type="file" name="csv_file" id="csv_upload" accept=".csv" onchange="document.getElementById('csv_form').submit();">
+</form>
   
 <!-- 検索履歴 -->
   <script>

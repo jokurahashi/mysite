@@ -89,6 +89,7 @@ def user_delete(request, pk):
 User = get_user_model()
 
 
+# CSVダウンロード機能
 def export_users_csv(request):
     # 全ユーザーを取得
     users = User.objects.all()
@@ -111,3 +112,22 @@ def export_users_csv(request):
             ]
         )
     return response
+
+
+# CSVインポート機能
+def import_users_csv(request):
+    if request.method == "POST" and request.FILES.get("csv_file"):
+        csv_file = request.FILES["csv_file"]
+        if not csv_file.name.endswith(".csv"):
+            return redirect("accounts:user_list")
+        decoded_file = csv_file.read().decode("utf-8").splitlines()
+        reader = csv.DictReader(decoded_file)
+        count = 0
+        for row in reader:
+            username = row.get("Username")
+            email = row.get("Email")
+            if username and email:
+                # 既存ユーザーは作らない、存在しなければ作成
+                User.objects.get_or_create(username=username, defaults={"email": email})
+                count += 1
+    return redirect("accounts:user_list")

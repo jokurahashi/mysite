@@ -49,17 +49,20 @@
     {% endfor %}
   </table>
 
-  <p><a href="{% url 'accounts:signup' %}">新規ユーザー登録</a></p>
+<div style="display: flex; gap: 15px; margin-top: 15px; align-items: center;">
+    <a href="{% url 'accounts:signup' %}" style="line-height: 1.5;">新規ユーザー登録</a>
 
-  <p><a href="{% url 'accounts:export_users_csv' %}">CSVダウンロード</a></p>
+    <a href="{% url 'accounts:export_users_csv' %}?username={{ username_query }}&email={{ email_query }}">CSVダウンロード</a>
 
 
-<p><a href="#" onclick="document.getElementById('csv_upload').click(); return false;">CSVインポート</a></p>
-<form id="csv_form" action="{% url 'accounts:import_users_csv' %}" method="post" enctype="multipart/form-data" style="display: none;">
-    {% csrf_token %}
-    <input type="file" name="csv_file" id="csv_upload" accept=".csv" onchange="document.getElementById('csv_form').submit();">
-</form>
-  
+    <a href="#" style="line-height: 1.5;" onclick="document.getElementById('csv_upload').click(); return false;">CSVアップロード</a>
+
+    <form id="csv_form" action="{% url 'accounts:import_users_csv' %}" method="post" enctype="multipart/form-data" style="display: none;">
+        {% csrf_token %}
+        <input type="file" name="csv_file" id="csv_upload" accept=".csv" onchange="document.getElementById('csv_form').submit();">
+    </form>
+</div>
+
 <!-- 検索履歴 -->
   <script>
   const HISTORY_KEY = "userSearchHistory";

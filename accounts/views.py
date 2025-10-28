@@ -89,28 +89,50 @@ def user_delete(request, pk):
 User = get_user_model()
 
 
+# contains 関数を定義
+def contains(haystack: str, needle: str) -> bool:
+    """文字列 haystack に needle が含まれているかの確認"""
+    return needle.lower() in haystack.lower()
+
+
 # CSVダウンロード機能
 def export_users_csv(request):
-    # 全ユーザーを取得
-    users = User.objects.all()
-    # CSVを生成
-    response = HttpResponse(content_type="text/csv; charset=utf-8")
-    response["Content-Disposition"] = 'attachment; filename="users.csv"'
-    writer = csv.writer(response)
-    writer.writerow(["ID", "Username", "Email", "Created At"])
+    # GET パラメータから検索条件を取得
+    username_query = request.GET.get("username", "").strip()
+    email_query = request.GET.get("email", "").strip()
+
+    # 全ユーザー取得 → 条件で絞り込み
+    users = User.objects.all().order_by("-updated_at", "-created_at")
+
+    # 検索条件でフィルタ
+    filtered_users = []
     for user in users:
+        username_match = (
+            contains(user.username, username_query) if username_query else True
+        )
+        email_match = contains(user.email, email_query) if email_query else True
+        if username_match and email_match:
+            filtered_users.append(user)
+    # CSVを生成
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = 'attachment; filename="users.csv"'
+    response.write("\ufeff")
+    writer = csv.writer(response)
+    writer.writerow(
+        ["ID", "ユーザー名", "メールアドレス", "誕生日", "作成日時", "更新日時"]
+    )
+    for user in filtered_users:
         writer.writerow(
             [
                 user.id,
                 user.username,
                 user.email,
-                (
-                    user.date_joined.strftime("%Y-%m-%d %H:%M:%S")
-                    if user.date_joined
-                    else ""
-                ),
+                user.birthday,
+                user.created_at,
+                user.updated_at,
             ]
         )
+
     return response
 
 

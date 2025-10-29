@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import CustomUserCreationForm, CustomUserEditForm
 from .models import CustomUser
 from django.contrib import messages
+from django.db.models import Q
 import csv
 from django.http import HttpResponse
 from django.contrib.auth import get_user_model
@@ -89,30 +90,18 @@ def user_delete(request, pk):
 User = get_user_model()
 
 
-# contains 関数を定義
-def contains(haystack: str, needle: str) -> bool:
-    """文字列 haystack に needle が含まれているかの確認"""
-    return needle.lower() in haystack.lower()
-
-
 # CSVダウンロード機能
 def export_users_csv(request):
     # GET パラメータから検索条件を取得
     username_query = request.GET.get("username", "").strip()
     email_query = request.GET.get("email", "").strip()
 
-    # 全ユーザーを取得
-    all_users = User.objects.all()
+    # 検索条件でフィルタ(検索条件をまとめて一度に取得)
+    users = User.objects.filter(
+        Q(username__icontains=username_query) if username_query else Q(),
+        Q(email__icontains=email_query) if email_query else Q(),
+    ).order_by("-updated_at", "-created_at")
 
-    # 検索条件でフィルタ
-    filtered_users = []
-    for user in all_users:
-        username_match = (
-            contains(user.username, username_query) if username_query else True
-        )
-        email_match = contains(user.email, email_query) if email_query else True
-        if username_match and email_match:
-            filtered_users.append(user)
     # CSVを生成
     response = HttpResponse(content_type="text/csv")
     response["Content-Disposition"] = 'attachment; filename="users.csv"'
@@ -121,7 +110,7 @@ def export_users_csv(request):
     writer.writerow(
         ["ID", "ユーザー名", "メールアドレス", "誕生日", "作成日時", "更新日時"]
     )
-    for user in filtered_users:
+    for user in users:
         writer.writerow(
             [
                 user.username,

@@ -6,6 +6,8 @@ from django.db.models import Q
 import csv
 from django.http import HttpResponse
 from django.contrib.auth import get_user_model
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 
 
 # ユーザー登録ビュー
@@ -128,16 +130,61 @@ def export_users_csv(request):
 def import_users_csv(request):
     if request.method == "POST" and request.FILES.get("csv_file"):
         csv_file = request.FILES["csv_file"]
+
+        # CSVチェック
         if not csv_file.name.endswith(".csv"):
+            messages.error(request, "CSVファイルを選択してください。")
             return redirect("accounts:user_list")
+
+        # ファイル読み込み
         decoded_file = csv_file.read().decode("utf-8").splitlines()
         reader = csv.DictReader(decoded_file)
-        count = 0
-        for row in reader:
-            username = row.get("Username")
-            email = row.get("Email")
-            if username and email:
-                # 既存ユーザーは作らない、存在しなければ作成
-                User.objects.get_or_create(username=username, defaults={"email": email})
-                count += 1
+
+        # ヘッダー検証
+        expected_headers = ["Username", "Email"]
+        if reader.fieldnames != expected_headers:
+            messages.error(
+                request,
+                "CSVヘッダーが正しくありません。",
+            )
+            return redirect("accounts:user_list")
+
+        success_count = 0
+        error_count = 0
+
+        # 各行を検証しながら登録
+        for i, row in enumerate(reader, start=2):  # 2行目からデータ開始
+            username = row.get("Username", "").strip()
+            email = row.get("Email", "").strip()
+
+            # 必須項目チェック
+            if not username or not email:
+                messages.warning(
+                    request, f"{i}行目: ユーザー名またはメールアドレスが空です。"
+                )
+                error_count += 1
+                continue
+
+            # メール形式チェック
+            try:
+                validate_email(email)
+            except ValidationError:
+                messages.warning(
+                    request, f"{i}行目: メールアドレス形式が不正です。({email})"
+                )
+                error_count += 1
+                continue
+
+            # 既存ユーザー重複チェック
+            if User.objects.filter(username=username).exists():
+                messages.info(
+                    request,
+                    f"{i}行目: ユーザー '{username}' は既に存在します。スキップしました。",
+                )
+                continue
+
+            # 作成
+            User.objects.create(username=username, email=email)
+            success_count += 1
+
     return redirect("accounts:user_list")

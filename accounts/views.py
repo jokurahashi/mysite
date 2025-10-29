@@ -101,7 +101,7 @@ def export_users_csv(request):
     username_query = request.GET.get("username", "").strip()
     email_query = request.GET.get("email", "").strip()
 
-    # 全ユーザー取得
+    # 全ユーザーを取得
     all_users = User.objects.all()
 
     # 検索条件でフィルタ

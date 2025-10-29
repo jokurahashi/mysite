@@ -102,7 +102,7 @@ def export_users_csv(request):
     email_query = request.GET.get("email", "").strip()
 
     # 全ユーザー取得
-    all_users = User.objects.all().order_by("-updated_at", "-created_at")
+    all_users = User.objects.all()
 
     # 検索条件でフィルタ
     filtered_users = []

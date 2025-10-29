@@ -101,12 +101,12 @@ def export_users_csv(request):
     username_query = request.GET.get("username", "").strip()
     email_query = request.GET.get("email", "").strip()
 
-    # 全ユーザー取得 → 条件で絞り込み
-    users = User.objects.all().order_by("-updated_at", "-created_at")
+    # 全ユーザー取得
+    all_users = User.objects.all().order_by("-updated_at", "-created_at")
 
     # 検索条件でフィルタ
     filtered_users = []
-    for user in users:
+    for user in all_users:
         username_match = (
             contains(user.username, username_query) if username_query else True
         )
@@ -124,7 +124,6 @@ def export_users_csv(request):
     for user in filtered_users:
         writer.writerow(
             [
-                user.id,
                 user.username,
                 user.email,
                 user.birthday,

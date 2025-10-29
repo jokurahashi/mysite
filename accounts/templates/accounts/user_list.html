@@ -14,10 +14,37 @@
 
   <!-- 検索フォーム -->
   <form id="searchForm" method="get" style="margin-bottom: 10px;">
-    <input type="text" id="usernameInput" name="username" placeholder="ユーザー名" value="{{ username_query }}">
-    <input type="text" id="emailInput" name="email" placeholder="メールアドレス" value="{{ email_query }}">
-    <button type="submit">検索</button>
-  </form>
+<div style="display: flex; gap: 15px; margin-bottom: 10px;">
+    <div>
+      <label for="username">ユーザー名:</label><br>
+      <input type="text" id="username" name="username" value="{{ username_query }}">
+    </div>
+
+    <div>
+      <label for="email">メールアドレス:</label><br>
+      <input type="text" id="email" name="email" value="{{ email_query }}">
+    </div>
+  </div>
+
+  <!-- 作成日時 -->
+  <div style="margin-bottom: 10px;">
+    <label>作成日時:</label><br>
+    <input type="date" name="created_from" value="{{ created_from }}"> ～ 
+    <input type="date" name="created_to" value="{{ created_to }}">
+  </div>
+
+  <!-- 更新日時 -->
+  <div style="margin-bottom: 15px;">
+    <label>更新日時:</label><br>
+    <input type="date" name="updated_from" value="{{ updated_from }}"> ～ 
+    <input type="date" name="updated_to" value="{{ updated_to }}">
+  </div>
+
+  <!-- 検索ボタン -->
+  <div>
+    <button type="submit" style="padding: 10px 20px; font-size: 1.2em;">検索</button>
+  </div>
+</form>
 
   <!-- 検索履歴 -->
   <div id="searchHistory" style="margin-bottom: 15px;">
@@ -52,7 +79,9 @@
 <div style="display: flex; gap: 15px; margin-top: 15px; align-items: center;">
     <a href="{% url 'accounts:signup' %}" style="line-height: 1.5;">新規ユーザー登録</a>
 
-    <a href="{% url 'accounts:export_users_csv' %}?username={{ username_query }}&email={{ email_query }}">CSVダウンロード</a>
+    <a href="{% url 'accounts:export_users_csv' %}?username={{ request.GET.username }}&email={{ request.GET.email }}&created_from={{ request.GET.created_from }}&created_to={{ request.GET.created_to }}&updated_from={{ request.GET.updated_from }}&updated_to={{ request.GET.updated_to }}">CSVダウンロード</a>
+
+
 
 
     <a href="#" style="line-height: 1.5;" onclick="document.getElementById('csv_upload').click(); return false;">CSVアップロード</a>

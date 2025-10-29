@@ -8,6 +8,7 @@ from django.http import HttpResponse
 from django.contrib.auth import get_user_model
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
+from django.utils.dateparse import parse_date
 
 
 # ユーザー登録ビュー
@@ -32,21 +33,42 @@ def signup(request):
 
 # ユーザー一覧ビュー
 def user_list(request):
+
+    # 検索機能(検索処理を行う、空白だと全件表示させる)
+    username_query = request.GET.get("username", "").strip()
+    email_query = request.GET.get("email", "").strip()
+    created_from = request.GET.get("created_from", "")
+    created_to = request.GET.get("created_to", "")
+    updated_from = request.GET.get("updated_from", "")
+    updated_to = request.GET.get("updated_to", "")
+
     users = CustomUser.objects.all().order_by("-updated_at", "-created_at")
 
     # 検索機能(検索処理を行う、空白だと全件表示させる)
-    username_query = request.GET.get("username", "")
-    email_query = request.GET.get("email", "")
 
     if username_query:  # 大文字と小文字の区別を行う
         users = users.filter(username__contains=username_query)
     if email_query:  # メールアドレスは大文字と小文字の区別を行わない
         users = users.filter(email__icontains=email_query)
 
+    # 日付で絞り込み
+    if created_from:
+        users = users.filter(created_at__gte=parse_date(created_from))
+    if created_to:
+        users = users.filter(created_at__lte=parse_date(created_to))
+    if updated_from:
+        users = users.filter(updated_at__gte=parse_date(updated_from))
+    if updated_to:
+        users = users.filter(updated_at__lte=parse_date(updated_to))
+
     context = {
         "users": users,
         "username_query": username_query,
         "email_query": email_query,
+        "created_from": created_from,
+        "created_to": created_to,
+        "updated_from": updated_from,
+        "updated_to": updated_to,
     }
     return render(request, "accounts/user_list.html", context)
 
@@ -97,11 +119,19 @@ def export_users_csv(request):
     # GET パラメータから検索条件を取得
     username_query = request.GET.get("username", "").strip()
     email_query = request.GET.get("email", "").strip()
+    created_from_date = request.GET.get("created_from", "").strip()
+    created_to_date = request.GET.get("created_to", "").strip()
+    updated_from_date = request.GET.get("updated_from", "").strip()
+    updated_to_date = request.GET.get("updated_to", "").strip()
 
-    # 検索条件でフィルタ(検索条件をまとめて一度に取得)
+    # フィルタ条件を組み立てる
     users = User.objects.filter(
         Q(username__icontains=username_query) if username_query else Q(),
         Q(email__icontains=email_query) if email_query else Q(),
+        Q(created_at__gte=created_from_date) if created_from_date else Q(),
+        Q(created_at__lte=created_to_date) if created_to_date else Q(),
+        Q(updated_at__gte=updated_from_date) if updated_from_date else Q(),
+        Q(updated_at__lte=updated_to_date) if updated_to_date else Q(),
     ).order_by("-updated_at", "-created_at")
 
     # CSVを生成
